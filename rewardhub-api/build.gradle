@@ -17,3 +17,11 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 }
+
+// Bundle the built admin dashboard (Vite output) into the boot jar under /static.
+tasks.named('processResources') {
+	dependsOn ':rewardhub-admin-ui:npmBuild'
+	from(project(':rewardhub-admin-ui').layout.buildDirectory.dir('dist')) {
+		into 'static'
+	}
+}

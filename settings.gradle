@@ -2,4 +2,4 @@ rootProject.name = 'rewardhub'
 
 include 'rewardhub-core'
 include 'rewardhub-api'
-// 'rewardhub-admin-ui' will be added in the frontend-scaffold step.
+include 'rewardhub-admin-ui'
