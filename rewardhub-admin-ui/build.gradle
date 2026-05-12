@@ -1,0 +1,36 @@
+plugins {
+	id 'base'
+}
+
+// The admin dashboard is a Vite/React app. These tasks shell out to npm so the
+// frontend participates in the Gradle build (and gets bundled into rewardhub-api).
+// Uses the system `npm`/`node` on PATH.
+
+def npmInstall = tasks.register('npmInstall', Exec) {
+	description = 'Installs frontend dependencies (npm install).'
+	group = 'frontend'
+	workingDir = projectDir
+	commandLine 'npm', 'install'
+	inputs.files('package.json', 'package-lock.json')
+	outputs.dir('node_modules')
+	outputs.cacheIf { false }
+}
+
+def npmBuild = tasks.register('npmBuild', Exec) {
+	description = 'Builds the admin dashboard SPA into build/dist.'
+	group = 'frontend'
+	dependsOn npmInstall
+	workingDir = projectDir
+	commandLine 'npm', 'run', 'build'
+	inputs.dir('src')
+	inputs.dir('public')
+	inputs.files(
+		'package.json', 'package-lock.json', 'vite.config.ts',
+		'tsconfig.json', 'tsconfig.app.json', 'tsconfig.node.json', 'index.html',
+	)
+	outputs.dir(layout.buildDirectory.dir('dist'))
+}
+
+tasks.named('assemble') {
+	dependsOn npmBuild
+}

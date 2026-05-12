@@ -255,12 +255,14 @@ All mutations require `Idempotency-Key`. All responses are versioned; errors are
 
 ### Phase 0 — Foundations
 - [x] Restructure to monorepo multi-module Gradle: root project + `rewardhub-core` + `rewardhub-api`; existing app moved into `rewardhub-api` (main class at `com.rewardhub` root package); `settings.gradle` wired; shared config in root `build.gradle` via `subprojects {}`.
-- [ ] Scaffold `rewardhub-admin-ui` (React + TS, Vite) as a Gradle module via the node-gradle plugin; wire its build output into `rewardhub-api` static resources so `./gradlew build` bundles it.
+- [x] Scaffold `rewardhub-admin-ui` (React 19 + TS + Vite) as a Gradle module (`base` plugin + `npm` Exec tasks `npmInstall`/`npmBuild` — simpler than the node-gradle plugin, swap later if CI needs managed Node). Vite outputs to `build/dist`; `rewardhub-api:processResources` copies it into `static/` so `./gradlew build` bundles the SPA into the boot jar (served at `/`).
 - [x] Add **Flyway** to `rewardhub-api` (`spring-boot-starter-flyway` + `flyway-mysql` — note: Boot 4.0 split Flyway auto-config out of `spring-boot-autoconfigure`); `spring.jpa.hibernate.ddl-auto=validate`; migrations live in `rewardhub-api/src/main/resources/db/migration`.
 - [x] Stop tracking `application-local.properties` (`git rm --cached`; already gitignored; file stays on disk for local dev). NOTE: the plaintext password is still in older git commits — needs a history rewrite (BFG/`git filter-repo`) to fully purge.
-- [ ] `BaseEntity` (id, timestamps) and `TenantEntity` (+ org_id) in `rewardhub-core`.
-- [ ] Tenant context holder + resolution hook.
-- [ ] RFC 7807 error model + global exception handler.
+- [x] `BaseEntity` (`Long` id, `Instant` created/updated via Spring Data JPA auditing — `@EnableJpaAuditing` in `JpaConfig`) and `TenantEntity` (+ `org_id`) in `rewardhub-core/common`.
+- [x] `TenantContext` thread-local holder in `rewardhub-core/common`; `TenantContextFilter` in `rewardhub-api/web` clears it per request. (Populating it from the authenticated principal lands in Phase 1; full Hibernate `@Filter` / tenant-aware repo base also Phase 1.)
+- [x] RFC 7807 error model: `DomainException` / `ResourceNotFoundException` / `ConflictException` in `rewardhub-core/exception`; `GlobalExceptionHandler` (`@RestControllerAdvice extends ResponseEntityExceptionHandler`) in `rewardhub-api/web`; `spring.mvc.problemdetails.enabled=true`.
+
+**Phase 0 complete.** Build green (`./gradlew clean build`). Nothing committed yet.
 
 ### Phase 1 — Tenancy & auth
 - [ ] `Organization`, `OrgUser` + migrations.

@@ -3,21 +3,24 @@ plugins {
 	id 'org.springframework.boot' version '4.0.5' apply false
 }
 
-subprojects {
-	apply plugin: 'java'
-	apply plugin: 'io.spring.dependency-management'
-
+allprojects {
 	group = 'com.rewardhub'
 	version = '0.0.1-SNAPSHOT'
+
+	repositories {
+		mavenCentral()
+	}
+}
+
+// Java/Spring config applies only to the JVM modules — not the frontend module.
+configure([project(':rewardhub-core'), project(':rewardhub-api')]) {
+	apply plugin: 'java'
+	apply plugin: 'io.spring.dependency-management'
 
 	java {
 		toolchain {
 			languageVersion = JavaLanguageVersion.of(17)
 		}
-	}
-
-	repositories {
-		mavenCentral()
 	}
 
 	dependencyManagement {
