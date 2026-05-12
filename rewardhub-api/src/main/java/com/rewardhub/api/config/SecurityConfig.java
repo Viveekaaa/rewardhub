@@ -1,4 +1,4 @@
-package com.rewardhub.rewardhub.config;
+package com.rewardhub.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

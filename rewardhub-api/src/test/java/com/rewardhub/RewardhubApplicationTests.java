@@ -1,4 +1,4 @@
-package com.rewardhub.rewardhub;
+package com.rewardhub;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
